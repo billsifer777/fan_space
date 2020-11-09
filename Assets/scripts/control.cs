@@ -25,21 +25,25 @@ public class control : MonoBehaviour, IBeginDragHandler
     // Update is called once per frame
     void Update()
     {
-        
+        Debug.Log(this.rb.velocity.magnitude);
         if (Input.GetMouseButtonDown(0))    //при клике
          {
-             fly=true;
-            rb.simulated=true;               //включаем физику
-            Vector2 vector = (tr.position-planet.position);  //вычисляем направление полета
-            rb.AddForce(vector*acceleration, ForceMode2D.Impulse); //придаем импульс гг
-            tr.SetParent(null);    //отпускаем от планеты гг
-          //  planet=null;
+             if(this.rb.velocity.magnitude==0)  // если стоим
+                    {
+                        rb.simulated=true;               //включаем физику
+                        Vector2 vector = (tr.position-planet.position);  //вычисляем направление полета
+                        rb.AddForce(vector*acceleration, ForceMode2D.Impulse); //придаем импульс гг
+                         tr.SetParent(null);    //отпускаем от планеты гг
+                        //  planet=null;
+                    }
+            
          }
     }
     private void OnCollisionEnter2D(Collision2D coll) //при соприкосновении с телом
     {
         if (coll.gameObject.CompareTag("planet")&(planet.name!=coll.gameObject.name)) //если тег=планета 
             {
+                rb.velocity = new Vector2(0, 0); //задаем скорость по нулям
                 fly=false;
                 //rb.velocity = Vector2.zero;
                 planet=coll.transform;   //переменная планет=планета с которой мы столкнулись
@@ -61,23 +65,36 @@ public class control : MonoBehaviour, IBeginDragHandler
             {
                 SceneManager.LoadScene(SceneManager.GetActiveScene().name); //перезагрузка сцены
             } 
-             if (coll.gameObject.CompareTag("money")) //тригер= смерть
+             if (coll.gameObject.CompareTag("money")) //тригер= денижки
             {
               Destroy(coll.gameObject);
               Debug.Log("collision");
             } 
-             if (coll.gameObject.CompareTag("sun")) //тригер= солнце
+             
+            }
+    private void OnTriggerStay2D(Collider2D coll)  //находимся ли в поле воздейсвия солнца
+        {
+            if (coll.gameObject.CompareTag("sun")) //тригер= солнце
             {
-             Debug.Log("collision");
+                if(this.rb.velocity.magnitude!=0)  // если летим
+                    {
+                       fly=true; //активируем булевую переменную
+                    }
             }
-            }
+        }
+    
+    
     public void  OnBeginDrag(PointerEventData eventData) //коснулись экрана
     {
-        fly=true;     //начали полет(оторвались от планеты)
-        rb.simulated=true;  //включаем физику
-        Vector2 vector = (tr.position-planet.position);  //вычисляем направление полета
-        rb.AddForce(vector*acceleration, ForceMode2D.Impulse); //придаем импульс гг
-        tr.SetParent(null);  //отпускаем от планеты гг
+        if(this.rb.velocity.magnitude==0)  // если стоим
+            {
+                fly=true;     //начали полет(оторвались от планеты)
+                rb.simulated=true;  //включаем физику
+                Vector2 vector = (tr.position-planet.position);  //вычисляем направление полета
+                rb.AddForce(vector*acceleration, ForceMode2D.Impulse); //придаем импульс гг
+                tr.SetParent(null);  //отпускаем от планеты гг   
+            }
+
     }
 
 }

@@ -22,7 +22,7 @@ public class bad_planets : MonoBehaviour
     
         Vector2 DirectionPlanet1 = (transform.position-tr.position).normalized;  //вектор по направлению к планете
       
-        if(control.fly)
+        if(control.fly)  //если гг в полете
             rb.AddForce(DirectionPlanet1*5); //придаем импульс гг
         
         transform.Rotate(0,0,Rotate);
